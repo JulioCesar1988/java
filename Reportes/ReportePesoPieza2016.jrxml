@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ControlDeProduccion" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="21bca02b-8b13-4129-b981-f5feb0aabc4f">
+	<property name="ireport.zoom" value="1.3310000000000004"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="numObra" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="elem" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="correlatividad" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+              piezas.correlatividad ,
+              piezas.elemento, SUM(subpiezas.peso) AS Peso_de_pieza,
+              piezas.descripcion,paquetes.numero as numPaquete , obras.numero as numObra
+from Obras inner join paquetes  on (obras.id_obra = paquetes.id_obra)
+                    inner join piezas on (piezas.id_paquete = paquetes.id_paquete)
+                    inner join subpiezas on (piezas.id_pieza = subpiezas.id_pieza  )
+where  obras.numero = $P{numObra} and  piezas.correlatividad = $P{correlatividad} and piezas.elemento = $P{elem} and
+       paquetes.activado = 1 and paquetes.activado = 1 and piezas.activado = 1 and subpiezas.activado = 1
+
+group by  obras.numero ,
+          paquetes.numero ,
+          piezas.elemento ,
+          piezas.correlatividad ,
+          piezas.id_pieza ,
+          piezas.descripcion]]>
+	</queryString>
+	<field name="correlatividad" class="java.lang.String"/>
+	<field name="elemento" class="java.lang.String"/>
+	<field name="Peso_de_pieza" class="java.math.BigDecimal"/>
+	<field name="descripcion" class="java.lang.String"/>
+	<field name="numPaquete" class="java.lang.Integer"/>
+	<field name="numObra" class="java.lang.Integer"/>
+	<title>
+		<band height="79" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="555" height="79" uuid="afde012f-d1f0-4587-b0f7-32f6ea1e6a2d"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="79" forecolor="#808080" uuid="25f55c4c-2a13-468c-8232-e1133dde191a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="18" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Reporte de Peso de una piezas]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch">
+			<staticText>
+				<reportElement x="355" y="0" width="100" height="20" forecolor="#696969" uuid="23f49bbb-b373-4dc5-be75-6938a8c17b8c"/>
+				<textElement textAlignment="Center">
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Peso]]></text>
+			</staticText>
+			<textField pattern="###0.00;###0.00-">
+				<reportElement x="455" y="0" width="100" height="20" forecolor="#696969" uuid="71bf8c3c-5b11-4ab6-b8d4-523d434b0635"/>
+				<textElement textAlignment="Center">
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Peso_de_pieza}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="100" height="20" forecolor="#696969" uuid="f0960776-ce03-4927-bd13-f0b9dab7e788"/>
+				<textElement textAlignment="Center">
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{numObra}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="111" y="0" width="100" height="20" forecolor="#696969" uuid="1d6038aa-a454-4a68-828d-1329d079fc47"/>
+				<textElement textAlignment="Center">
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{numPaquete}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="211" y="0" width="144" height="20" forecolor="#696969" uuid="e1b289ba-c1a7-411c-af12-69eea9755d00"/>
+				<textElement textAlignment="Center">
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{descripcion}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+</jasperReport>

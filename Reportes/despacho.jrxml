@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="despacho" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0300cfa4-a432-4220-b989-cdb6b6b229b8">
+	<property name="ireport.zoom" value="1.2100000000000002"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="numObra" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="numPaquete" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="numCodigo" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="numRemito" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="filtro" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[DECLARE @OPCION INT
+SET @OPCION = $P{filtro}
+
+IF @OPCION = 1
+BEGIN
+SELECT PAQUETES.NUMERO AS NUMERO_PAQUETE,
+       OBRAS.NUMERO    AS NUMERO_OBRA,
+       OBRAS.DIRECCION AS DIRECCION_OBRA,
+       OBRAS.LOCALIDAD AS LOCALIDAD_OBRA,
+       OBRAS.PROVINCIA AS PROVINCIA_LOCALIDAD,
+       REMITOS.NUMERO  AS NUMERO_REMITO,
+       PIEZAS.DESCRIPCION AS DESCRIPCION_PIEZA,
+       PIEZAS.DESCRIPCION_EXTRA AS PIEZA_DESCRIPCION_EXTRA,
+       COUNT(PIEZAS.ID_PIEZA) AS CANTIDAD,
+       REMITOS.FECHA AS FECHA_REMITO,
+       OBRAS.NOMBRE AS NOMBRE_OBRA,
+       PIEZAS.CODIGO AS CODIGO_PIEZA,
+       PIEZAS.ELEMENTO AS ELEMENTO_PIEZA,
+       PIEZAS.CORRELATIVIDAD AS CORRELATIVIDAD_PIEZA,
+       PAQUETES.FECHA_DESPACHO AS FECHA_DESPACHO
+
+                FROM      ( SELECT * FROM OBRAS WHERE activado = 1 AND NUMERO = $P{numObra} )AS OBRAS
+                LEFT  JOIN( SELECT * FROM PAQUETES WHERE ACTIVADO = 1)AS PAQUETES ON ( OBRAS.ID_OBRA = PAQUETES.ID_OBRA )
+
+                LEFT JOIN ( SELECT * FROM PIEZAS WHERE ACTIVADO = 1 ) AS PIEZAS ON ( PIEZAS.ID_PAQUETE = PAQUETES.ID_PAQUETE)
+                LEFT JOIN ( SELECT * FROM PIEZAS_REMITOS WHERE ACTIVADO = 1)AS REMITOS_PIEZAS ON ( PIEZAS.ID_PIEZA = REMITOS_PIEZAS.ID_PIEZA)
+                LEFT JOIN ( SELECT * FROM REMITOS WHERE ACTIVADO =1 )AS REMITOS ON (REMITOS_PIEZAS.ID_REMITO = REMITOS.ID_REMITO)
+where  ((obras.numero = $P{numObra} )and(( piezas.codigo = $P{numCodigo}) or ( $P{numCodigo}= 0))
+        and ((paquetes.numero = $P{numPaquete})or($P{numPaquete} = 0))and((remitos.numero = $P{numRemito})or($P{numRemito} = 0 ))
+        and (PIEZAS.AREA <> 'Warehouse')and(piezas.finalizado = 1))
+
+                 GROUP BY
+                    PAQUETES.NUMERO,
+
+                     PIEZAS.CODIGO,
+                     PIEZAS.ELEMENTO,
+                      OBRAS.NUMERO,
+                      OBRAS.DIRECCION ,
+                      OBRAS.LOCALIDAD,
+                      OBRAS.PROVINCIA,
+                    REMITOS.NUMERO,
+                     PIEZAS.DESCRIPCION,
+                     PIEZAS.DESCRIPCION_EXTRA,
+                     OBRAS.NOMBRE,
+                     REMITOS.FECHA,
+                     PIEZAS.CORRELATIVIDAD,
+                     PAQUETES.FECHA_DESPACHO
+
+                ORDER BY
+                   PAQUETES.NUMERO
+END
+ ELSE
+  BEGIN
+   SELECT PAQUETES.NUMERO AS NUMERO_PAQUETE,
+       OBRAS.NUMERO    AS NUMERO_OBRA,
+       OBRAS.DIRECCION AS DIRECCION_OBRA,
+       OBRAS.LOCALIDAD AS LOCALIDAD_OBRA,
+       OBRAS.PROVINCIA AS PROVINCIA_LOCALIDAD,
+       REMITOS.NUMERO  AS NUMERO_REMITO,
+       PIEZAS.DESCRIPCION AS DESCRIPCION_PIEZA,
+       PIEZAS.DESCRIPCION_EXTRA AS PIEZA_DESCRIPCION_EXTRA,
+       COUNT(PIEZAS.ID_PIEZA) AS CANTIDAD,
+       REMITOS.FECHA AS FECHA_REMITO,
+       OBRAS.NOMBRE AS NOMBRE_OBRA,
+       PIEZAS.CODIGO AS CODIGO_PIEZA,
+       PIEZAS.ELEMENTO AS ELEMENTO_PIEZA,
+       PIEZAS.CORRELATIVIDAD AS CORRELATIVIDAD_PIEZA,
+        PAQUETES.FECHA_DESPACHO AS FECHA_DESPACHO
+                FROM      ( SELECT * FROM OBRAS WHERE activado = 1 AND NUMERO = $P{numObra} )AS OBRAS
+                LEFT  JOIN( SELECT * FROM PAQUETES WHERE ACTIVADO = 1)AS PAQUETES ON ( OBRAS.ID_OBRA = PAQUETES.ID_OBRA )
+
+                LEFT JOIN ( SELECT * FROM PIEZAS WHERE ACTIVADO = 1 ) AS PIEZAS ON ( PIEZAS.ID_PAQUETE = PAQUETES.ID_PAQUETE)
+                LEFT JOIN ( SELECT * FROM PIEZAS_REMITOS WHERE ACTIVADO = 1)AS REMITOS_PIEZAS ON ( PIEZAS.ID_PIEZA = REMITOS_PIEZAS.ID_PIEZA)
+                LEFT JOIN ( SELECT * FROM REMITOS WHERE ACTIVADO =1 )AS REMITOS ON (REMITOS_PIEZAS.ID_REMITO = REMITOS.ID_REMITO)
+where  ((obras.numero = $P{numObra} )and(( piezas.codigo = $P{numCodigo}) or ( $P{numCodigo}= 0))
+        and ((paquetes.numero = $P{numPaquete})or($P{numPaquete} = 0))and((remitos.numero = $P{numRemito})or($P{numRemito} = 0 ))
+        and (PIEZAS.AREA <> 'Warehouse')and(piezas.finalizado = 1)and (piezas.id_pieza not in (select id_pieza from piezas_remitos where activado = 1 )  )  )
+
+                 GROUP BY
+                    PAQUETES.NUMERO,
+
+                     PIEZAS.CODIGO,
+                     PIEZAS.ELEMENTO,
+                     OBRAS.NUMERO,
+                     OBRAS.DIRECCION ,
+                     OBRAS.LOCALIDAD,
+                     OBRAS.PROVINCIA,
+                     REMITOS.NUMERO,
+                     PIEZAS.DESCRIPCION,
+                     PIEZAS.DESCRIPCION_EXTRA,
+                     OBRAS.NOMBRE,
+                     REMITOS.FECHA,
+                     PIEZAS.CORRELATIVIDAD,
+                     PAQUETES.FECHA_DESPACHO
+
+                ORDER BY
+                   PAQUETES.NUMERO
+END]]>
+	</queryString>
+	<field name="NUMERO_PAQUETE" class="java.lang.Integer"/>
+	<field name="NUMERO_OBRA" class="java.lang.Integer"/>
+	<field name="DIRECCION_OBRA" class="java.lang.String"/>
+	<field name="LOCALIDAD_OBRA" class="java.lang.String"/>
+	<field name="PROVINCIA_LOCALIDAD" class="java.lang.String"/>
+	<field name="NUMERO_REMITO" class="java.lang.Integer"/>
+	<field name="DESCRIPCION_PIEZA" class="java.lang.String"/>
+	<field name="PIEZA_DESCRIPCION_EXTRA" class="java.lang.String"/>
+	<field name="CANTIDAD" class="java.lang.Integer"/>
+	<field name="FECHA_REMITO" class="java.sql.Timestamp"/>
+	<field name="NOMBRE_OBRA" class="java.lang.String"/>
+	<field name="CODIGO_PIEZA" class="java.lang.Integer"/>
+	<field name="ELEMENTO_PIEZA" class="java.lang.String"/>
+	<field name="CORRELATIVIDAD_PIEZA" class="java.lang.String"/>
+	<field name="FECHA_DESPACHO" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="802" height="79" uuid="14096d42-25c9-4063-9f23-cb94d795b84a"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="0" width="181" height="79" uuid="e938cedc-0ce8-4efa-b432-b5a5804e7568"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="530" y="0" width="272" height="79" uuid="3857fb88-bd35-4bee-9e08-75f277a8eb82"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="200" y="0" width="287" height="30" uuid="04129194-4baf-4446-aba5-f47156c733f6"/>
+				<textElement>
+					<font size="18" isBold="true" isItalic="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Reporte  de sector despacho ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="50" width="40" height="20" uuid="ff96cfcf-00fe-4e01-97ca-0d74a5440377"/>
+				<textElement>
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[N° : ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="30" width="40" height="20" uuid="07e5375d-1792-4efc-9d57-a83c647e78c1"/>
+				<textElement>
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Obra : ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="242" y="50" width="100" height="20" uuid="e01c40b5-cb0e-4444-9115-382dc67db097"/>
+				<textFieldExpression><![CDATA[$F{NUMERO_OBRA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="242" y="30" width="231" height="20" uuid="afcfc67b-d6a4-43ad-804e-4311057a52a5"/>
+				<textFieldExpression><![CDATA[$F{NOMBRE_OBRA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="540" y="10" width="63" height="20" uuid="01422bf4-91f8-4d3b-b7d2-8d7eb7086f7d"/>
+				<textElement>
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Direccion :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="541" y="30" width="66" height="20" uuid="449f6958-bbd2-4e57-bf6d-cc8b7b17fa0b"/>
+				<textElement>
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Localidad :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="541" y="50" width="62" height="20" uuid="b72a6a9f-b55c-4898-ba86-ce51ef6a50f9"/>
+				<textElement>
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Provincia :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="613" y="10" width="189" height="20" uuid="c4374ba4-2322-4b39-a59d-0024f9f94f1d"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DIRECCION_OBRA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="613" y="30" width="189" height="20" uuid="5367c8fa-72af-4e3d-b7fd-0bf6f03f8f8e"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LOCALIDAD_OBRA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="613" y="50" width="185" height="20" uuid="bdfa1ec3-e04c-4ca9-9450-00eae0634b48"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PROVINCIA_LOCALIDAD}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="43" y="4" width="100" height="66" uuid="b5cb808c-b276-498a-b708-fb31a418a87d"/>
+				<imageExpression><![CDATA["Reportes\\logoHeader.png"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="802" height="35" uuid="8ca6630a-4e5a-4a72-b62f-0bfbaf5b8221"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="14" y="0" width="139" height="20" uuid="67f059bd-0c39-4f16-aca6-a695c5e4ac99"/>
+				<textElement>
+					<font size="12" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Seguimiento de piezas ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="308" y="0" width="142" height="20" uuid="0eadbcd3-4ba1-4a1a-a24d-889396733110"/>
+				<textElement>
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{filtro}.equals( 0 ) ? "Faltantes a despachar " : " total despachado "]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="200" y="0" width="108" height="20" uuid="d5ac93b4-ee1c-4fa1-9a76-82fd6a1f246a"/>
+				<textElement>
+					<font size="10" isBold="false" isItalic="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Tipo de filtro aplicado :  ]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="530" y="0" width="272" height="20" uuid="ca96d73e-e0b9-4b52-92b3-923219973728"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="592" y="0" width="63" height="20" uuid="2462e9c4-0a8f-4473-b370-de7c09eb7989"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[fecha actual:]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="655" y="0" width="137" height="14" uuid="34b35750-cec7-4d6f-936d-601284a23244"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="23" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="802" height="23" uuid="c6e777b3-869a-4bce-97e8-f37f6e3463a6"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="27" height="20" uuid="4ed1b3b9-42d9-42b4-a165-365017352528"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Paq.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="29" y="0" width="62" height="15" uuid="47f6c1b1-6f2f-420a-858d-829beacde662"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Fecha desp.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="91" y="0" width="48" height="15" uuid="5d577933-3b25-4010-883b-a5c495a56c81"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Elem.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="139" y="0" width="26" height="15" uuid="38b75238-ca14-44f1-8c51-040707d86dc8"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Corr.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="197" y="0" width="100" height="20" uuid="c2e45fe9-507d-442b-9ceb-83c7c699de6f"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Descripcion de pieza]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="350" y="0" width="123" height="20" uuid="1cbd7bb7-9b07-487c-b5ec-019f1d4ca6fd"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Descripcion extra ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="518" y="0" width="54" height="20" uuid="a6e0444b-2ce8-4218-b463-bb784d5f17b3"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Cantidad ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="592" y="0" width="100" height="20" uuid="43836f4c-2ecc-4f3e-971b-4fc46f2a5f94"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[N°de remito]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="702" y="0" width="100" height="16" uuid="5ad09ce2-0e7d-46b1-a6a0-5ffc04a61227"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Fecha ]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="18" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="802" height="18" uuid="9667ff5f-5dbc-43da-b94c-2d5d79298a59"/>
+			</rectangle>
+			<textField>
+				<reportElement x="0" y="3" width="27" height="15" uuid="83021031-e289-4ced-b7a7-295d6ff18e0e"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUMERO_PAQUETE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="29" y="2" width="64" height="16" uuid="4faa983c-064f-47d3-86e2-69f48f41ce00"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FECHA_DESPACHO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="95" y="3" width="48" height="14" uuid="9ebe6a68-6eaf-4bd6-9f5a-fb10573a90ae"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ELEMENTO_PIEZA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="143" y="0" width="54" height="15" uuid="52297acc-c501-46df-a528-90e11f737325"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CORRELATIVIDAD_PIEZA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="0" width="150" height="15" uuid="63834e80-9d43-4b6f-9fbc-b9eaf06135e2"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPCION_PIEZA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="350" y="1" width="168" height="14" uuid="925526de-926c-49de-a890-95f0c4c4da0d"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PIEZA_DESCRIPCION_EXTRA}.equals( null ) ?"sin descripcion extra" : $F{PIEZA_DESCRIPCION_EXTRA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="518" y="3" width="74" height="15" uuid="60bd4441-a7fe-4cd2-b6a9-547b33afbd4f"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CANTIDAD}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="592" y="1" width="100" height="14" uuid="aa1e5cf2-c63d-4381-83f0-cda09d4d43ea"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUMERO_REMITO}.equals ( null )?" Sin remitir":$F{NUMERO_REMITO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="692" y="3" width="100" height="14" uuid="a1f59645-ac7a-4242-8644-9c6c3fb7cdaf"/>
+				<textFieldExpression><![CDATA[$F{FECHA_REMITO}.equals( null ) ? "sin fecha" :$F{FECHA_REMITO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="10" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="15" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

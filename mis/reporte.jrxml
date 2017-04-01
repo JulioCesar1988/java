@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="nuevoReporteParaPañol2" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="833a03d5-170d-43fb-a694-ede04696e255">
+	<property name="ireport.zoom" value="1.3310000000000055"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="numObra" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="numCodigo" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="numPaquete" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="numRemito" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="filtro_aplicado" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="elem" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select  elemento_warehouse_cantidad.id_elemento_cantidad,
+                         piezas.descripcion,
+                         elemento_warehouse_cantidad.cantidad as CantidadPedida ,
+                         SUM(elemento_warehouse_parcial.cantidad )AS SumaDeParciales,
+                         obras.nombre ,
+                         obras.numero,
+                         remitos.numero as numRemito,
+                         paquetes.numero as numPaquete,
+                         piezas.codigo,
+                         obras.localidad,
+                         obras.provincia,
+                         obras.direccion,
+                         remitos.fecha as fecha_remitos,
+                         piezas.elemento as elemento_pieza
+
+                from  (select * from elemento_warehouse_cantidad where activado = 1)as elemento_warehouse_cantidad
+                left join (select * from elemento_warehouse_parcial where activado = 1)as elemento_warehouse_parcial on
+                ( elemento_warehouse_cantidad.id_elemento_cantidad = elemento_warehouse_parcial.id_elemento_cantidad)
+                left join (select * from piezas where activado = 1 ) as piezas on ( piezas.id_pieza = elemento_warehouse_cantidad.id_pieza)
+                left join (select * from paquetes where activado=1)as paquetes on (piezas.id_paquete = paquetes.id_paquete)
+                left join (select * from obras where activado = 1 )as obras on (obras.id_obra = paquetes.id_obra )
+                /*Vamos a ver si estan remitidas o no */
+                left join (select  * from elemento_warehouse_parcial_remito where activado = 1 )as elemento_warehouse_parcial_remito on
+                 (elemento_warehouse_parcial.id_elemento_warehouse_parcial = elemento_warehouse_parcial_remito.id_elemento_warehouse_parcial)
+                 left join (select * from remitos where activado =1)as remitos on ( elemento_warehouse_parcial_remito.id_remito =remitos.id_remito)
+
+where  (obras.numero = $P{numObra} )and(( piezas.codigo = $P{numCodigo}) or ( $P{numCodigo}= 0))
+        and ((paquetes.numero = $P{numPaquete})or($P{numPaquete} = 0))and((remitos.numero = $P{numRemito})or($P{numRemito} = 0 ))
+        and ((piezas.elemento like $P{elem})or( $P{elem} ='nada'))
+
+                 group by elemento_warehouse_cantidad.id_elemento_cantidad ,
+                          elemento_warehouse_cantidad.cantidad ,
+                          piezas.descripcion ,
+                          obras.nombre ,
+                          obras.numero ,
+                          obras.localidad,
+                          obras.direccion,
+                          obras.provincia,
+                          remitos.numero ,
+                          paquetes.numero ,
+                          piezas.codigo,
+                          remitos.fecha,
+                           piezas.elemento
+
+                 order by  paquetes.numero,
+                           remitos.numero]]>
+	</queryString>
+	<field name="id_elemento_cantidad" class="java.lang.Integer"/>
+	<field name="descripcion" class="java.lang.String"/>
+	<field name="CantidadPedida" class="java.lang.Integer"/>
+	<field name="SumaDeParciales" class="java.lang.Integer"/>
+	<field name="nombre" class="java.lang.String"/>
+	<field name="numero" class="java.lang.Integer"/>
+	<field name="numRemito" class="java.lang.Integer"/>
+	<field name="numPaquete" class="java.lang.Integer"/>
+	<field name="codigo" class="java.lang.Integer"/>
+	<field name="localidad" class="java.lang.String"/>
+	<field name="provincia" class="java.lang.String"/>
+	<field name="direccion" class="java.lang.String"/>
+	<field name="fecha_remitos" class="java.sql.Timestamp"/>
+	<field name="elemento_pieza" class="java.lang.String"/>
+	<group name="nombre">
+		<groupExpression><![CDATA[$F{nombre}]]></groupExpression>
+	</group>
+	<group name="numero">
+		<groupExpression><![CDATA[$F{numero}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<rectangle>
+				<reportElement x="-1" y="0" width="754" height="79" uuid="d50d781a-68bf-4b8f-bb86-9a8bce8b45af"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="-2" y="1" width="133" height="78" uuid="ca86cb9a-301e-4522-85ec-5b4e870b1147"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="486" y="0" width="267" height="79" uuid="d5111fe4-54f8-4c17-b4ba-381c31530640"/>
+			</rectangle>
+			<image>
+				<reportElement x="20" y="3" width="111" height="68" uuid="1741a1b3-bd6b-4843-9310-73936489cdd8"/>
+				<imageExpression><![CDATA["Reportes\\logoHeader.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="155" y="0" width="331" height="31" uuid="6282bc59-1ea7-4dd6-a000-5304f539a207"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font size="16" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Elementos  Werehouse  Enviados a Obra ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="155" y="31" width="36" height="20" uuid="c5c48d74-888d-425f-872e-c2c3830d741a"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Obra :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="155" y="51" width="36" height="20" uuid="d7fbebbc-ddc4-464c-a8ce-90e6c2b36464"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[N °:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="191" y="31" width="250" height="20" uuid="091ab48d-a6c2-4e7a-b56f-5df0670436d9"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="191" y="51" width="100" height="20" uuid="897cc4f8-9494-482f-b417-fb623ea61397"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{numObra}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="498" y="1" width="70" height="20" uuid="1b3dc8fb-94be-447f-aa00-dd0eeb2c60ca"/>
+				<textElement>
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Localidad:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="498" y="21" width="70" height="20" uuid="9e29fef8-0390-475b-ac4d-1e462b728abb"/>
+				<textElement>
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Direccion:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="498" y="41" width="70" height="20" uuid="a35dbb43-a969-423d-8ec2-7da5072c02f5"/>
+				<textElement>
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Provincia:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="569" y="1" width="184" height="20" uuid="5bb34dd0-3798-46a7-9c4f-fd44eac940f6"/>
+				<textElement>
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{localidad}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="569" y="21" width="184" height="20" uuid="5d642409-7f5e-4eb0-9d12-f712a14f0879"/>
+				<textElement>
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{direccion}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="568" y="41" width="184" height="20" uuid="d2dfd491-7def-4414-b939-563a809d7f0d"/>
+				<textElement>
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{provincia}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="22" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="0" width="752" height="1" uuid="70c2dfd4-e3d2-4f7f-8b5e-86591e141080"/>
+			</line>
+			<line>
+				<reportElement x="0" y="21" width="752" height="1" uuid="ca674d10-a631-42fb-a918-136ce122240e"/>
+			</line>
+			<rectangle>
+				<reportElement x="-2" y="1" width="755" height="20" uuid="6a612198-16ee-4cd8-b22a-c563c495eaa8"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="1" width="463" height="20" uuid="1d3440fa-cd8b-4086-9123-1bd14a90f4ff"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="14" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Reporte de elementos enviados a obra por el sector warehouse]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="463" y="0" width="93" height="20" uuid="dac911d9-5eb8-470b-bd91-813d9e450a87"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="14" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Fecha actual : ]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy h.mm a">
+				<reportElement x="556" y="2" width="137" height="20" uuid="963df08d-a4d2-47af-99fb-4e9d4de34bb7"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="10" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="24" splitType="Stretch">
+			<rectangle>
+				<reportElement x="-2" y="0" width="755" height="24" uuid="02b7311e-f29c-469e-8fae-226d695f4686"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="-2" y="0" width="22" height="20" uuid="11d5d639-a745-414c-bae1-0c7a1bb616e0"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font size="12" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Paq]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="41" y="0" width="48" height="20" uuid="70fd2b0f-8aed-4213-abbf-7652ea47731b"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="12" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Código]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="121" y="4" width="54" height="20" uuid="bd93995e-4a22-4dc5-9814-c07d5ba27685"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Elem]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="193" y="4" width="124" height="20" uuid="ef3bbdf1-ed47-45d5-8c35-3ccabb2aa519"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="12" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Descripcion]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="360" y="4" width="81" height="20" uuid="fc0f4fbb-d609-4a77-9884-79af723536e9"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="12" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Cantidad ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="456" y="4" width="65" height="20" uuid="17ea6481-f518-4230-baf9-6a9d22c60ee9"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="12" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Parciales]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="539" y="6" width="75" height="18" uuid="0c626702-5c39-43a0-9334-f6f4b96fb7a2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Remito]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="642" y="4" width="75" height="18" uuid="46eed978-d45d-4fd7-a115-576a3f91424b"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="12" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Fecha]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<rectangle>
+				<reportElement x="-2" y="0" width="755" height="20" uuid="0a700156-7713-4fa7-b303-14eae9c78f28"/>
+			</rectangle>
+			<textField>
+				<reportElement x="-2" y="0" width="26" height="20" uuid="a72c4e5e-a43b-41ad-8570-417bac2d748a"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{numPaquete}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="31" y="0" width="47" height="20" uuid="9aed058b-1b4c-4cf5-aba0-9e74e411cf8f"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{codigo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="121" y="0" width="54" height="20" uuid="9b226033-903f-4349-9387-df369606a4f0"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{elemento_pieza}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="193" y="0" width="124" height="20" uuid="319640ec-3c3b-4ff5-9f5a-bc86abf4926d"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{descripcion}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="360" y="0" width="81" height="20" uuid="c8a53b6f-2753-46ce-8149-3e832ed27c60"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{CantidadPedida}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="456" y="0" width="65" height="20" uuid="c1a16765-ac53-4c1b-8cf5-1c04cd45006e"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{SumaDeParciales}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="539" y="0" width="70" height="20" uuid="d1a97730-beda-478b-98b8-94d9591dc857"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{numRemito}.equals( null)?"Sin Remitir":$F{numRemito}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="642" y="1" width="75" height="19" uuid="eb40241d-e940-485b-8624-ae3f34fc0624"/>
+				<textFieldExpression><![CDATA[$F{fecha_remitos}.equals( null )?"Sin fecha":$F{fecha_remitos}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="23" splitType="Stretch">
+			<textField>
+				<reportElement x="652" y="0" width="100" height="20" uuid="1bf2a53b-8e01-40ec-b33d-6dc2779f900f"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+</jasperReport>

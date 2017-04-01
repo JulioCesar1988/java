@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reporteParametros" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1724262b-7d38-4180-b3c1-e07cecb4ac39">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="Arial" fontSize="12"/>
+	<parameter name="legajo" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="nombre_empresa" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="imagen" class="java.lang.Object">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     *,
+     empleado."legajo" AS empleado_legajo,
+     empleado."nombre" AS empleado_nombre,
+     empleado."apellido" AS empleado_apellido,
+     empleado."mail" AS empleado_mail,
+     empresa."id_empresa" AS empresa_id_empresa,
+     empresa."nombre" AS empresa_nombre,
+     empleado."id_empresa" AS empleado_id_empresa
+FROM
+     "Empleados" empleado INNER JOIN "Empresas" empresa ON empleado."id_empresa" = empresa."id_empresa"
+WHERE
+     empleado.legajo = $P{legajo}]]>
+	</queryString>
+	<field name="id_empleado" class="java.lang.Integer"/>
+	<field name="id_empresa" class="java.lang.Integer"/>
+	<field name="legajo" class="java.lang.Integer"/>
+	<field name="fecha_ingreso" class="java.lang.String"/>
+	<field name="fecha_egreso" class="java.lang.String"/>
+	<field name="nombre" class="java.lang.String"/>
+	<field name="apellido" class="java.lang.String"/>
+	<field name="id_sector" class="java.lang.Integer"/>
+	<field name="id_nivel" class="java.lang.Integer"/>
+	<field name="password" class="java.lang.String"/>
+	<field name="usuario" class="java.lang.Boolean"/>
+	<field name="activado" class="java.lang.Boolean"/>
+	<field name="mail" class="java.lang.String"/>
+	<field name="nombre_completo" class="java.lang.String"/>
+	<field name="direccion" class="java.lang.String"/>
+	<field name="empleado_legajo" class="java.lang.Integer"/>
+	<field name="empleado_nombre" class="java.lang.String"/>
+	<field name="empleado_apellido" class="java.lang.String"/>
+	<field name="empleado_mail" class="java.lang.String"/>
+	<field name="empresa_id_empresa" class="java.lang.Integer"/>
+	<field name="empresa_nombre" class="java.lang.String"/>
+	<field name="empleado_id_empresa" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="287" splitType="Stretch">
+			<staticText>
+				<reportElement style="Title" x="0" y="0" width="263" height="33" uuid="af482c2f-c513-40a1-8c8e-06dc679a34ce"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Empleado miller	]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="0" y="55" width="61" height="15" uuid="cd167c0b-9aee-4bb1-ab16-6f8c6ab5244c"/>
+				<text><![CDATA[legajo]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="Detail" x="48" y="55" width="61" height="15" uuid="09120a7e-bce2-4592-be25-243bcd0451a6"/>
+				<textFieldExpression><![CDATA[$F{legajo}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Column header" x="0" y="70" width="61" height="15" uuid="47241661-1696-4c73-a227-5afa17ea0cd1"/>
+				<text><![CDATA[nombre]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="Detail" x="48" y="70" width="61" height="15" uuid="ae228f4f-80b3-4d39-a99d-40607fa7646e"/>
+				<textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Column header" x="0" y="85" width="61" height="15" uuid="679d7696-39d4-4868-b21a-d3c6fb355ddc"/>
+				<text><![CDATA[apellido]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="Detail" x="48" y="85" width="61" height="15" uuid="a4121495-19a6-4c00-8e7a-abf36c4e073c"/>
+				<textFieldExpression><![CDATA[$F{apellido}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Column header" x="0" y="100" width="61" height="15" uuid="17245ccd-00f9-4e78-9101-cf2de0e2f6f4"/>
+				<text><![CDATA[mail]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="Detail" x="48" y="100" width="61" height="15" uuid="f17b91aa-0695-4815-bc2f-87ee5fbddbe8"/>
+				<textFieldExpression><![CDATA[$F{mail}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="375" y="0" width="138" height="126" uuid="5e61a56c-67d8-48d3-a5e4-f29b2c6b2c70"/>
+				<imageExpression><![CDATA["C:\\Users\\jcontreras\\Desktop\\miller.jpg"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="22" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement style="Column header" x="433" y="0" width="80" height="20" uuid="ffb5fa93-1b4d-410e-981e-e0659f270dfe"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement style="Column header" x="513" y="0" width="40" height="20" uuid="57c28645-012f-4c88-95e4-92cd464495e1"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement style="Column header" x="0" y="0" width="197" height="20" uuid="c8f7ea3a-1a85-4b98-a64a-a8c87ef59951"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

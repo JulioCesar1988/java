@@ -1,0 +1,608 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteParaAgrupar" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9bb03b49-f9cb-40cf-9770-14a4ce2d611b">
+	<property name="ireport.zoom" value="1.464100000000004"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="numObra" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="filtro" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[DECLARE @OPCION INT
+SET @OPCION = $P{filtro}
+IF @OPCION = 1
+BEGIN
+SELECT
+        FINALIZADO.DESCRIPCION,
+        FINALIZADO.CANTIDAD,
+        PENDIENTES.cantidad_faltante,
+        SIN_PINTAR.ELEMENTOS_FINALIZADOS_SIN_PINTAR,
+        FINALIZADOS.ELEMENTOS_FINALIZADOS,
+        FINALIZADO.NOMBRE_OBRA,
+        FINALIZADO.NUMERO_OBRA,
+        FINALIZADO.LOCALIDAD_OBRA,
+        FINALIZADO.DIRECCION_OBRA,
+        FINALIZADO.PROVINCIA_OBRA
+
+FROM
+(SELECT COUNT(DISTINCT( piezas.id_pieza )) AS CANTIDAD,
+        PIEZAS.DESCRIPCION,
+        OBRAS.NOMBRE AS NOMBRE_OBRA,
+        OBRAS.NUMERO AS NUMERO_OBRA,
+        OBRAS.LOCALIDAD AS LOCALIDAD_OBRA,
+        OBRAS.DIRECCION AS DIRECCION_OBRA,
+        OBRAS.PROVINCIA AS PROVINCIA_OBRA
+
+
+
+FROM(SELECT * FROM OBRAS WHERE activado = 1 AND NUMERO = $P{numObra} ) AS Obras
+    left join (SELECT * FROM PAQUETES                  WHERE ACTIVADO = 1) AS paquetes         ON(Obras.id_obra = paquetes.id_obra)
+    left join (SELECT * FROM PIEZAS                    WHERE ACTIVADO = 1) AS Piezas           ON(Paquetes.id_paquete = Piezas.id_paquete)
+    left join (SELECT * FROM SUBPIEZAS                 WHERE ACTIVADO = 1) AS subpiezas        ON(piezas.id_pieza = subpiezas.id_pieza)
+    left join (SELECT * FROM SUBPIEZAS_TAREAS          WHERE ACTIVADO = 1) AS subpiezas_tareas ON(subpiezas.id_subpieza = subpiezas_tareas.id_subpieza)
+    left join (SELECT * FROM TAREAS                    WHERE ACTIVADO = 1) AS tareas           ON(subpiezas_tareas.id_tarea = tareas.id_tarea)
+    left join (SELECT * FROM CATEGORIA_CTRL_PRODUCCION WHERE ACTIVO   = 1) AS CATEGORIAS       ON(PIEZAS.ID_CATEGORIA = CATEGORIAS.ID_CATEGORIA)
+WHERE(piezas.area <> 'Warehouse') AND (PAQUETES.ID_PAQUETE IN (SELECT ID_PAQUETE FROM PAQUETE_EMPLEADO_APROBADO_PRODUCCION WHERE ACTIVADO = 1 ))
+
+GROUP BY
+         PIEZAS.DESCRIPCION ,
+
+         OBRAS.NOMBRE ,
+         OBRAS.NUMERO ,
+         OBRAS.LOCALIDAD ,
+         OBRAS.DIRECCION ,
+         OBRAS.PROVINCIA
+
+         ) AS FINALIZADO
+
+LEFT JOIN
+(
+SELECT
+       COUNT(DISTINCT( piezas.id_pieza )) AS cantidad_faltante ,
+       PIEZAS.DESCRIPCION as descripcion_faltantes ,
+       OBRAS.NOMBRE ,
+       OBRAS.NUMERO  ,
+       OBRAS.LOCALIDAD ,
+       OBRAS.DIRECCION ,
+
+       OBRAS.PROVINCIA
+
+FROM(SELECT * FROM Obras                           WHERE activado = 1 AND numero =$P{numObra} ) AS Obras
+    left join (SELECT * FROM paquetes              WHERE activado = 1) AS paquetes         ON (Obras.id_obra             = paquetes.id_obra)
+    left join (SELECT * FROM Piezas                WHERE activado = 1) AS Piezas           ON (Paquetes.id_paquete       = Piezas.id_paquete)
+    left join (SELECT * FROM subpiezas             WHERE activado = 1) AS subpiezas        ON (piezas.id_pieza           = subpiezas.id_pieza)
+    left join (SELECT * FROM subpiezas_tareas      WHERE activado = 1) AS subpiezas_tareas ON (subpiezas.id_subpieza     = subpiezas_tareas.id_subpieza)
+    left join (SELECT * FROM tareas                WHERE activado = 1) AS tareas           ON (subpiezas_tareas.id_tarea = tareas.id_tarea)
+    left join (SELECT * FROM categoria_ctrl_produccion WHERE activo = 1)AS categorias on (piezas.id_categoria = categorias.id_categoria)
+WHERE(piezas.area <> 'Warehouse')AND(piezas.finalizado = 0 )AND(subpiezas_tareas.estado = 'pendiente')AND( (subpiezas_tareas.fecha_finalizado is null))
+
+GROUP BY
+         PIEZAS.DESCRIPCION ,
+
+         OBRAS.NOMBRE ,
+         OBRAS.NUMERO ,
+         OBRAS.LOCALIDAD ,
+         OBRAS.DIRECCION ,
+
+         OBRAS.PROVINCIA )AS PENDIENTES ON (FINALIZADO.DESCRIPCION = PENDIENTES.descripcion_faltantes )
+
+left join (
+
+SELECT COUNT (DISTINCT(PIEZAS.ID_PIEZA)) AS ELEMENTOS_FINALIZADOS_SIN_PINTAR ,
+       PIEZAS.DESCRIPCION AS DESCRIPCION_FINALIZADO_SIN_PINTAR ,
+       OBRAS.DIRECCION    AS DIRECCION_OBRA,
+       OBRAS.LOCALIDAD    AS DIRECCION_LOCALIDAD,
+       OBRAS.PROVINCIA    AS PROVINCIA_OBRA,
+       OBRAS.NUMERO       AS NUMERO_OBRA,
+       OBRAS.NOMBRE       AS NOMBRE_OBRA
+
+FROM (SELECT * FROM OBRAS WHERE NUMERO =$P{numObra}  )AS OBRAS
+     LEFT JOIN ( SELECT *  FROM PAQUETES         WHERE (ACTIVADO = 1)AND (ID_PAQUETE IN ( SELECT ID_PAQUETE FROM PAQUETE_EMPLEADO_ENVIADO WHERE ACTIVADO = 1  )  )) AS PAQUETES          ON (OBRAS.ID_OBRA                = PAQUETES.ID_OBRA)
+     LEFT JOIN ( SELECT *  FROM PIEZAS           WHERE ACTIVADO = 1) AS PIEZAS            ON (PAQUETES.ID_PAQUETE          = PIEZAS.ID_PAQUETE)
+     LEFT JOIN ( SELECT *  FROM SUBPIEZAS        WHERE ACTIVADO = 1) AS SUBPIEZAS         ON (SUBPIEZAS.ID_PIEZA           = PIEZAS.ID_PIEZA)
+     LEFT JOIN ( SELECT *  FROM SUBPIEZAS_TAREAS WHERE ACTIVADO = 1 )AS SUBPIEZAS_TAREAS  ON (SUBPIEZAS_TAREAS.ID_SUBPIEZA = SUBPIEZAS.ID_SUBPIEZA)
+     LEFT JOIN ( SELECT *  FROM TAREAS           WHERE ACTIVADO = 1) AS TAREAS            ON (SUBPIEZAS_TAREAS.ID_TAREA    = TAREAS.ID_TAREA)
+     LEFT JOIN ( SELECT *  FROM CATEGORIA_CTRL_PRODUCCION WHERE ACTIVO = 1 )AS CATEGORIAS ON (CATEGORIAS.ID_CATEGORIA      = PIEZAS.ID_CATEGORIA)
+
+ WHERE   (TAREAS.CODIGO <> 'T1')AND(TAREAS.CODIGO <> 'T5') AND (PIEZAS.AREA <> 'warehouse')AND(PIEZAS.FINALIZADO = 0 )
+ GROUP BY
+          PIEZAS.DESCRIPCION,
+
+          OBRAS.NUMERO ,
+          OBRAS.NOMBRE ,
+          OBRAS.DIRECCION ,
+          OBRAS.LOCALIDAD,
+          OBRAS.PROVINCIA,
+          PIEZAS.AREA
+
+) AS SIN_PINTAR ON (FINALIZADO.DESCRIPCION = SIN_PINTAR.DESCRIPCION_FINALIZADO_SIN_PINTAR )
+
+LEFT JOIN
+
+(
+
+SELECT COUNT (DISTINCT(PIEZAS.ID_PIEZA)) AS ELEMENTOS_FINALIZADOS ,
+       PIEZAS.DESCRIPCION AS DESCRIPCION_FINALIZADO ,
+       OBRAS.DIRECCION ,
+       OBRAS.LOCALIDAD ,
+       OBRAS.PROVINCIA,
+       OBRAS.NUMERO AS NUMERO_OBRA ,
+       OBRAS.NOMBRE AS NOMBRE_OBRA
+FROM (SELECT * FROM OBRAS WHERE NUMERO = $P{numObra} )AS OBRAS
+     inner JOIN ( SELECT *  FROM PAQUETES         WHERE ACTIVADO = 1) AS PAQUETES          ON (OBRAS.ID_OBRA                 = PAQUETES.ID_OBRA)
+     inner JOIN ( SELECT *  FROM PIEZAS           WHERE ACTIVADO = 1) AS PIEZAS            ON (PAQUETES.ID_PAQUETE           = PIEZAS.ID_PAQUETE)
+     inner JOIN ( SELECT *  FROM SUBPIEZAS        WHERE ACTIVADO = 1) AS SUBPIEZAS         ON (SUBPIEZAS.ID_PIEZA            = PIEZAS.ID_PIEZA)
+     inner JOIN ( SELECT *  FROM SUBPIEZAS_TAREAS WHERE ACTIVADO = 1 )AS SUBPIEZAS_TAREAS  ON ( SUBPIEZAS_TAREAS.ID_SUBPIEZA = SUBPIEZAS.ID_SUBPIEZA)
+     inner JOIN ( SELECT *  FROM TAREAS           WHERE ACTIVADO = 1) AS TAREAS            ON (SUBPIEZAS_TAREAS.ID_TAREA     = TAREAS.ID_TAREA)
+     inner JOIN ( SELECT * FROM CATEGORIA_CTRL_PRODUCCION WHERE ACTIVO = 1)AS CATEGORIAS ON (PIEZAS.ID_CATEGORIA = CATEGORIAS.ID_CATEGORIA)
+
+ WHERE  (PIEZAS.FINALIZADO = 1 )and (SUBPIEZAS_TAREAS.estado = 'finalizado')
+ GROUP BY
+          PIEZAS.DESCRIPCION,
+
+          OBRAS.NUMERO,
+          OBRAS.NOMBRE,
+          OBRAS.DIRECCION,
+          OBRAS.LOCALIDAD,
+          OBRAS.PROVINCIA
+) AS FINALIZADOS ON (FINALIZADO.DESCRIPCION = FINALIZADOS.DESCRIPCION_FINALIZADO)
+
+
+GROUP BY
+         FINALIZADO.DESCRIPCION,
+
+         FINALIZADO.CANTIDAD ,
+
+         PENDIENTES.cantidad_faltante,
+         SIN_PINTAR.ELEMENTOS_FINALIZADOS_SIN_PINTAR,
+         FINALIZADOS.ELEMENTOS_FINALIZADOS,
+         FINALIZADO.NOMBRE_OBRA,
+         FINALIZADO.NUMERO_OBRA,
+         FINALIZADO.LOCALIDAD_OBRA,
+         FINALIZADO.DIRECCION_OBRA,
+         FINALIZADO.PROVINCIA_OBRA
+
+END
+ELSE
+   BEGIN
+   SELECT
+
+        FINALIZADO.DESCRIPCION ,
+        FINALIZADO.CANTIDAD ,
+        PENDIENTES.cantidad_faltante,
+        SIN_PINTAR.ELEMENTOS_FINALIZADOS_SIN_PINTAR,
+        FINALIZADOS.ELEMENTOS_FINALIZADOS,
+        FINALIZADO.NOMBRE_OBRA,
+        FINALIZADO.NUMERO_OBRA,
+        FINALIZADO.LOCALIDAD_OBRA,
+        FINALIZADO.DIRECCION_OBRA,
+        FINALIZADO.PROVINCIA_OBRA
+
+FROM
+(SELECT COUNT(DISTINCT( piezas.id_pieza )) AS CANTIDAD,
+        PIEZAS.DESCRIPCION,
+        OBRAS.NOMBRE AS NOMBRE_OBRA,
+        OBRAS.NUMERO AS NUMERO_OBRA,
+        OBRAS.LOCALIDAD AS LOCALIDAD_OBRA,
+        OBRAS.DIRECCION AS DIRECCION_OBRA,
+
+        OBRAS.PROVINCIA AS PROVINCIA_OBRA
+
+FROM(SELECT * FROM OBRAS WHERE activado = 1 AND NUMERO = $P{numObra} ) AS Obras
+    left join (SELECT * FROM PAQUETES                  WHERE ACTIVADO = 1) AS paquetes         ON(Obras.id_obra = paquetes.id_obra)
+    left join (SELECT * FROM PIEZAS                    WHERE ACTIVADO = 1) AS Piezas           ON(Paquetes.id_paquete = Piezas.id_paquete)
+    left join (SELECT * FROM SUBPIEZAS                 WHERE ACTIVADO = 1) AS subpiezas        ON(piezas.id_pieza = subpiezas.id_pieza)
+    left join (SELECT * FROM SUBPIEZAS_TAREAS          WHERE ACTIVADO = 1) AS subpiezas_tareas ON(subpiezas.id_subpieza = subpiezas_tareas.id_subpieza)
+    left join (SELECT * FROM TAREAS                    WHERE ACTIVADO = 1) AS tareas           ON(subpiezas_tareas.id_tarea = tareas.id_tarea)
+    left join (SELECT * FROM CATEGORIA_CTRL_PRODUCCION WHERE ACTIVO   = 1) AS CATEGORIAS       ON(PIEZAS.ID_CATEGORIA = CATEGORIAS.ID_CATEGORIA)
+WHERE(piezas.area <> 'Warehouse') AND
+     (PAQUETES.ID_PAQUETE IN (SELECT ID_PAQUETE FROM PAQUETE_EMPLEADO_APROBADO_PRODUCCION WHERE ACTIVADO = 1 ))
+
+GROUP BY
+         PIEZAS.DESCRIPCION,
+
+         OBRAS.NOMBRE ,
+         OBRAS.NUMERO ,
+         OBRAS.LOCALIDAD ,
+         Obras.direccion,
+
+         OBRAS.PROVINCIA
+         ) AS FINALIZADO
+
+LEFT JOIN
+(
+SELECT
+       COUNT(DISTINCT( piezas.id_pieza )) AS cantidad_faltante ,
+       PIEZAS.DESCRIPCION as descripcion_faltantes ,
+       OBRAS.NOMBRE ,
+       OBRAS.NUMERO  ,
+       OBRAS.LOCALIDAD ,
+       OBRAS.DIRECCION ,
+
+       OBRAS.PROVINCIA
+
+FROM(SELECT * FROM Obras                           WHERE activado = 1 AND numero =$P{numObra} ) AS Obras
+    left join (SELECT * FROM paquetes              WHERE activado = 1) AS paquetes         ON (Obras.id_obra             = paquetes.id_obra)
+    left join (SELECT * FROM Piezas                WHERE activado = 1) AS Piezas           ON (Paquetes.id_paquete       = Piezas.id_paquete)
+    left join (SELECT * FROM subpiezas             WHERE activado = 1) AS subpiezas        ON (piezas.id_pieza           = subpiezas.id_pieza)
+    left join (SELECT * FROM subpiezas_tareas      WHERE activado = 1) AS subpiezas_tareas ON (subpiezas.id_subpieza     = subpiezas_tareas.id_subpieza)
+    left join (SELECT * FROM tareas                WHERE activado = 1) AS tareas           ON (subpiezas_tareas.id_tarea = tareas.id_tarea)
+    left join (SELECT * FROM categoria_ctrl_produccion WHERE activo = 1)AS categorias on (piezas.id_categoria = categorias.id_categoria)
+WHERE(piezas.area <> 'Warehouse')AND(piezas.finalizado = 0 )AND(subpiezas_tareas.estado = 'pendiente')AND( (subpiezas_tareas.fecha_finalizado is null))
+
+GROUP BY  PIEZAS.DESCRIPCION,
+
+         OBRAS.NOMBRE ,
+         OBRAS.NUMERO ,
+         OBRAS.LOCALIDAD ,
+         OBRAS.DIRECCION ,
+
+         OBRAS.PROVINCIA )AS PENDIENTES ON (FINALIZADO.DESCRIPCION = PENDIENTES.descripcion_faltantes )
+
+left join (
+
+SELECT COUNT (DISTINCT(PIEZAS.ID_PIEZA)) AS ELEMENTOS_FINALIZADOS_SIN_PINTAR ,
+       PIEZAS.DESCRIPCION AS DESCRIPCION_FINALIZADO_SIN_PINTAR ,
+       OBRAS.DIRECCION    AS DIRECCION_OBRA,
+       OBRAS.LOCALIDAD    AS DIRECCION_LOCALIDAD,
+       OBRAS.PROVINCIA    AS PROVINCIA_OBRA,
+       OBRAS.NUMERO       AS NUMERO_OBRA,
+       OBRAS.NOMBRE       AS NOMBRE_OBRA
+
+
+FROM (SELECT * FROM OBRAS WHERE NUMERO =$P{numObra}  )AS OBRAS
+     LEFT JOIN ( SELECT *  FROM PAQUETES         WHERE (ACTIVADO = 1)AND (ID_PAQUETE IN ( SELECT ID_PAQUETE FROM PAQUETE_EMPLEADO_ENVIADO WHERE ACTIVADO = 1  )  )) AS PAQUETES          ON (OBRAS.ID_OBRA                = PAQUETES.ID_OBRA)
+     LEFT JOIN ( SELECT *  FROM PIEZAS           WHERE ACTIVADO = 1) AS PIEZAS            ON (PAQUETES.ID_PAQUETE          = PIEZAS.ID_PAQUETE)
+     LEFT JOIN ( SELECT *  FROM SUBPIEZAS        WHERE ACTIVADO = 1) AS SUBPIEZAS         ON (SUBPIEZAS.ID_PIEZA           = PIEZAS.ID_PIEZA)
+     LEFT JOIN ( SELECT *  FROM SUBPIEZAS_TAREAS WHERE ACTIVADO = 1 )AS SUBPIEZAS_TAREAS  ON (SUBPIEZAS_TAREAS.ID_SUBPIEZA = SUBPIEZAS.ID_SUBPIEZA)
+     LEFT JOIN ( SELECT *  FROM TAREAS           WHERE ACTIVADO = 1) AS TAREAS            ON (SUBPIEZAS_TAREAS.ID_TAREA    = TAREAS.ID_TAREA)
+     LEFT JOIN ( SELECT *  FROM CATEGORIA_CTRL_PRODUCCION WHERE ACTIVO = 1 )AS CATEGORIAS ON (CATEGORIAS.ID_CATEGORIA      = PIEZAS.ID_CATEGORIA)
+
+
+ WHERE   (TAREAS.CODIGO <> 'T1')AND(TAREAS.CODIGO <> 'T5') AND (PIEZAS.AREA <> 'warehouse')AND(PIEZAS.FINALIZADO = 0 )
+ GROUP BY
+          PIEZAS.DESCRIPCION,
+
+          OBRAS.NUMERO ,
+          OBRAS.NOMBRE ,
+          OBRAS.DIRECCION ,
+          OBRAS.LOCALIDAD,
+          OBRAS.PROVINCIA
+
+) AS SIN_PINTAR ON (FINALIZADO.DESCRIPCION = SIN_PINTAR.DESCRIPCION_FINALIZADO_SIN_PINTAR )
+
+LEFT JOIN
+
+(
+
+SELECT COUNT (DISTINCT(PIEZAS.ID_PIEZA)) AS ELEMENTOS_FINALIZADOS ,
+       PIEZAS.DESCRIPCION AS DESCRIPCION_FINALIZADO ,
+       OBRAS.DIRECCION ,
+       OBRAS.LOCALIDAD ,
+       OBRAS.PROVINCIA,
+       OBRAS.NUMERO AS NUMERO_OBRA ,
+       OBRAS.NOMBRE AS NOMBRE_OBRA
+FROM (SELECT * FROM OBRAS WHERE NUMERO = $P{numObra} )AS OBRAS
+     inner JOIN ( SELECT *  FROM PAQUETES         WHERE ACTIVADO = 1) AS PAQUETES          ON (OBRAS.ID_OBRA                 = PAQUETES.ID_OBRA)
+     inner JOIN ( SELECT *  FROM PIEZAS           WHERE ACTIVADO = 1) AS PIEZAS            ON (PAQUETES.ID_PAQUETE           = PIEZAS.ID_PAQUETE)
+     inner JOIN ( SELECT *  FROM SUBPIEZAS        WHERE ACTIVADO = 1) AS SUBPIEZAS         ON (SUBPIEZAS.ID_PIEZA            = PIEZAS.ID_PIEZA)
+     inner JOIN ( SELECT *  FROM SUBPIEZAS_TAREAS WHERE ACTIVADO = 1 )AS SUBPIEZAS_TAREAS  ON ( SUBPIEZAS_TAREAS.ID_SUBPIEZA = SUBPIEZAS.ID_SUBPIEZA)
+     inner JOIN ( SELECT *  FROM TAREAS           WHERE ACTIVADO = 1) AS TAREAS            ON (SUBPIEZAS_TAREAS.ID_TAREA     = TAREAS.ID_TAREA)
+     inner JOIN ( SELECT * FROM CATEGORIA_CTRL_PRODUCCION WHERE ACTIVO = 1)AS CATEGORIAS ON (PIEZAS.ID_CATEGORIA = CATEGORIAS.ID_CATEGORIA)
+
+ WHERE  (PIEZAS.FINALIZADO = 1 )and (subpiezas_tareas.estado = 'finalizado')
+ GROUP BY
+          PIEZAS.DESCRIPCION,
+          OBRAS.NUMERO,
+          OBRAS.NOMBRE,
+          OBRAS.DIRECCION,
+          OBRAS.LOCALIDAD,
+          OBRAS.PROVINCIA
+) AS FINALIZADOS ON (FINALIZADO.DESCRIPCION = FINALIZADOS.DESCRIPCION_FINALIZADO)
+GROUP BY
+         FINALIZADO.DESCRIPCION,
+         FINALIZADO.CANTIDAD,
+         PENDIENTES.cantidad_faltante,
+         SIN_PINTAR.ELEMENTOS_FINALIZADOS_SIN_PINTAR,
+         FINALIZADOS.ELEMENTOS_FINALIZADOS,
+         FINALIZADO.NOMBRE_OBRA,
+         FINALIZADO.NUMERO_OBRA,
+         FINALIZADO.LOCALIDAD_OBRA,
+         FINALIZADO.DIRECCION_OBRA,
+         FINALIZADO.PROVINCIA_OBRA
+
+HAVING  ((COUNT(FINALIZADOS.ELEMENTOS_FINALIZADOS) = 0)or( FINALIZADO.CANTIDAD > FINALIZADOS.ELEMENTOS_FINALIZADOS))
+END]]>
+	</queryString>
+	<field name="DESCRIPCION" class="java.lang.String"/>
+	<field name="CANTIDAD" class="java.lang.Integer"/>
+	<field name="cantidad_faltante" class="java.lang.Integer"/>
+	<field name="ELEMENTOS_FINALIZADOS_SIN_PINTAR" class="java.lang.Integer"/>
+	<field name="ELEMENTOS_FINALIZADOS" class="java.lang.Integer"/>
+	<field name="NOMBRE_OBRA" class="java.lang.String"/>
+	<field name="NUMERO_OBRA" class="java.lang.Integer"/>
+	<field name="LOCALIDAD_OBRA" class="java.lang.String"/>
+	<field name="DIRECCION_OBRA" class="java.lang.String"/>
+	<field name="PROVINCIA_OBRA" class="java.lang.String"/>
+	<variable name="DESCRIPCION_1" class="java.lang.Integer" resetType="Column" calculation="Count">
+		<variableExpression><![CDATA[$F{DESCRIPCION}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="802" height="79" uuid="c2f2a3f4-f95d-45eb-a6b3-8e8d148c9fdb"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="126" y="0" width="380" height="20" uuid="87cec884-58d5-4436-a7d0-8d069af261cf"/>
+				<textElement>
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[                        Reporte de produccion por obra ]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="0" y="0" width="126" height="79" uuid="bef3c423-957c-46e4-9056-99d7970a4e6f"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="126" y="20" width="50" height="26" uuid="61f21308-974b-44ea-ba3b-3dd57c02358c"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[        Obra: ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="126" y="46" width="50" height="31" uuid="a7a9f03f-61ae-4b61-96d9-6550010da7d5"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[            N°: ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="176" y="21" width="330" height="25" uuid="3981a377-d1b5-4a32-80d3-1f3fbd106a4f"/>
+				<textElement>
+					<font size="10" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOMBRE_OBRA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="176" y="46" width="330" height="31" uuid="6fa13d3f-cc8b-4e22-8aff-378596b6829c"/>
+				<textElement>
+					<font size="10" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUMERO_OBRA}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="506" y="0" width="296" height="79" uuid="a320fabe-e05a-4f12-a5d9-619737f72efb"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="520" y="64" width="61" height="15" uuid="b6318f83-9f98-41d4-a4b1-3ac38a7dec09"/>
+				<textElement>
+					<font isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Provincia : ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="518" y="35" width="63" height="15" uuid="c70b66a1-0639-44c6-8c8c-f18aa932315b"/>
+				<textElement>
+					<font isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Localidad : ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="506" y="5" width="56" height="15" uuid="5b01dc36-8a1a-447f-9652-7e1c74f380b7"/>
+				<textElement>
+					<font isBold="false" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Direccion : ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="581" y="36" width="221" height="14" uuid="6bc18d6a-70f4-4f6b-b4ad-cc26ef787b1c"/>
+				<textElement>
+					<font size="10" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LOCALIDAD_OBRA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="577" y="7" width="225" height="13" uuid="e234276a-aa6d-49ee-bf68-6440c200d258"/>
+				<textElement>
+					<font size="10" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DIRECCION_OBRA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="581" y="64" width="221" height="13" uuid="495c1792-fa43-4749-a07a-7ffae955e190"/>
+				<textElement>
+					<font size="10" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PROVINCIA_OBRA}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="0" y="0" width="126" height="77" uuid="d05ad0ec-f963-4c41-b808-2e880dd01111"/>
+				<imageExpression><![CDATA["Reportes\\logoHeader.png"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="29" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="802" height="29" uuid="0be609c6-46c1-49c1-ba63-aae3f4c236b1"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="251" height="29" uuid="03ab7eac-94a9-4836-9dd8-71ad670ba05c"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Reporte para hacer un control de la produccion ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="483" y="0" width="84" height="29" uuid="1736f0fd-1b8a-49ba-8be8-f9022fd886d2"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[fecha de emision :]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy HH.mm.ss">
+				<reportElement x="567" y="0" width="235" height="29" uuid="fc9817d5-6b11-4b5b-9422-d91a994eb321"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="251" y="0" width="25" height="29" uuid="55a1c800-31e7-46f5-8071-0a80fc6757f6"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[filtro :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="277" y="0" width="206" height="29" uuid="4457a068-00da-4ba1-b6dc-167774bb98b6"/>
+				<textFieldExpression><![CDATA[$P{filtro}.equals( 0 )?"Faltantes a producir" : " Produccion total"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="26">
+			<rectangle>
+				<reportElement x="0" y="0" width="802" height="26" uuid="024ce77b-5ce0-441e-881c-e891ebabf8d2"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="0" width="228" height="26" uuid="a3f17508-7c13-470c-afdc-cd79aa451cda"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="228" y="0" width="117" height="26" uuid="eacb6b9a-aa6e-4196-8bdd-17c6f0ad73fe"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="345" y="0" width="138" height="26" uuid="7977856d-b187-425e-ae2f-37dd28af4326"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="483" y="0" width="84" height="26" uuid="0561dc29-d9ea-4e9d-9dd0-5fdaf83bdc20"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="1" width="228" height="25" uuid="87e2f4d0-2759-4efd-9346-3c5835081e23"/>
+				<textElement>
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Descripcion de elemento]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="228" y="1" width="117" height="25" uuid="ddae87d3-6fbf-4584-8989-d8f8b1ad68c3"/>
+				<textElement>
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Cantidad]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="345" y="0" width="138" height="26" uuid="eeddfbfc-52e8-4c5e-93f7-137c86ffaee6"/>
+				<textElement>
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Falta]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="483" y="0" width="84" height="26" uuid="654dbef7-2d4e-4911-bba7-e1c5de5a8bd7"/>
+				<textElement>
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Sin Pintar]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="567" y="0" width="94" height="26" uuid="75916d98-0df5-4ed6-9096-8726f1e8dcbf"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="567" y="0" width="94" height="26" uuid="39cdb848-d1c4-43ab-9384-9a4cadbf2a5f"/>
+				<textElement>
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Terminado]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="661" y="0" width="141" height="26" uuid="232cc4dc-cee2-40a7-9657-19979cc95c81"/>
+				<textElement>
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[observacion]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="1" width="228" height="15" uuid="2140b9fe-a0ac-448f-9f4c-7b859aab9c98"/>
+				<textElement>
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPCION}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="0" y="0" width="802" height="16" uuid="aaec2237-bef2-48af-a741-656bfa7c6dff"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="0" width="228" height="16" uuid="02c9e91b-5b30-435f-8490-79b765f28ada"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="228" y="0" width="117" height="16" uuid="b3dfa996-c5d2-4a39-b318-d7462aca2b3d"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="345" y="0" width="138" height="16" uuid="d66000ce-e6b6-4c85-a462-671724dd6b86"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="483" y="0" width="84" height="16" uuid="7198b0a0-6ca4-47a8-a473-8ad7a96ca1eb"/>
+			</rectangle>
+			<textField>
+				<reportElement x="0" y="1" width="228" height="15" uuid="0aad3258-688d-492b-a99c-4f921c4a5742"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPCION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="228" y="1" width="117" height="15" uuid="2b427520-259a-41ff-8c49-21871c28233c"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CANTIDAD}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="345" y="1" width="138" height="15" uuid="05fd82ba-a5b8-4c5a-8cf9-ada7eeba875b"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cantidad_faltante}.equals( null ) ? "0":$F{cantidad_faltante}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="483" y="1" width="84" height="15" uuid="e73f9952-c35c-43a1-b61d-1726e7cedafa"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ELEMENTOS_FINALIZADOS_SIN_PINTAR}.equals( null ) ? "0" :$F{ELEMENTOS_FINALIZADOS_SIN_PINTAR}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="567" y="0" width="94" height="16" uuid="c18059e4-03ad-4513-a48a-db334f2c235e"/>
+			</rectangle>
+			<textField>
+				<reportElement x="567" y="1" width="94" height="15" uuid="11f1c3a4-ff61-433f-ae75-5d28bcad96e9"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ELEMENTOS_FINALIZADOS}.equals( null ) ? "0" :$F{ELEMENTOS_FINALIZADOS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="50"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="50"/>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="50"/>
+	</lastPageFooter>
+	<summary>
+		<band height="50"/>
+	</summary>
+	<noData>
+		<band height="50"/>
+	</noData>
+</jasperReport>

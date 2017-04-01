@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report4" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9232f12c-c719-41d8-a3ee-b263456c0562">
+	<property name="ireport.zoom" value="2.143588810000002"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="numObra" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select obras.numero as numObra ,
+       edificio.nombre as numEdificio,
+       paquetes.numero as numPaquete,
+       paquetes.descripcion as  Descripcion
+
+from obras inner join paquetes  on (obras.id_obra = paquetes.id_obra)
+           inner join edificio  on (paquetes.id_edificio = edificio.id_edificio)
+where obras.activado = 1 and
+      paquetes.activado = 1 and
+      edificio.activado = 1 and obras.numero = $P{numObra}
+
+group by obras.numero,
+         edificio.id_edificio ,
+         edificio.nombre,
+         paquetes.numero,
+         paquetes.descripcion
+order by obras.numero ,
+         edificio.nombre]]>
+	</queryString>
+	<field name="numObra" class="java.lang.Integer"/>
+	<field name="numEdificio" class="java.lang.String"/>
+	<field name="numPaquete" class="java.lang.Integer"/>
+	<field name="Descripcion" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="555" height="79" uuid="f1e7dfb4-413c-4c3c-9724-9feb5fead18f"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="1" y="0" width="554" height="79" forecolor="#999999" uuid="845c8cfe-c123-4e4c-b03d-c5243044d771"/>
+				<textElement verticalAlignment="Middle">
+					<font size="20" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Reporte de paquetes de obra]]></text>
+			</staticText>
+			<image hAlign="Center">
+				<reportElement x="336" y="0" width="219" height="79" uuid="de9b1144-45f0-467e-99e3-97e29bfa0b95"/>
+				<imageExpression><![CDATA["Reportes\\logoHeader.png"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="13" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="555" height="13" backcolor="#99B4D1" uuid="f324813e-05d6-467c-9ff7-0f281f661621"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="80" height="13" forecolor="#666666" backcolor="#666666" uuid="80f59865-bd1f-4740-9276-840c66380919"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Obra]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="80" y="0" width="80" height="13" forecolor="#666666" uuid="1bfdbfa3-5ccc-4bca-9dd4-bd48707d5caf"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Edificio]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="160" y="0" width="71" height="13" forecolor="#666666" uuid="316f7d56-5e7e-476e-af9f-5f3490f1f83e"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Numero]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="231" y="0" width="324" height="13" forecolor="#666666" uuid="a5360fb0-7685-481f-9e4c-f2ec49f9ba96"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Descripcion]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="13" splitType="Stretch">
+			<rectangle>
+				<reportElement x="1" y="0" width="554" height="13" uuid="7beb5e3a-f4ed-4220-8a54-828ba43ef77d"/>
+			</rectangle>
+			<textField>
+				<reportElement x="0" y="0" width="80" height="13" uuid="9bde13f7-27ad-4f43-9eb7-16140be2f202"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="10" isBold="false" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{numObra}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="80" y="0" width="80" height="13" uuid="4055cc09-6851-4bd8-b333-ce9e14fc75a0"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="10" isBold="false" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{numEdificio}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="160" y="0" width="71" height="13" uuid="5017e89c-f1f6-403b-acb7-0992b9dbcc18"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="10" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{numPaquete}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="231" y="0" width="324" height="13" uuid="254383c3-4b9f-47f6-86b1-c56df5b2c425"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="10" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Descripcion}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="29" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="19" splitType="Stretch">
+			<textField>
+				<reportElement x="292" y="0" width="100" height="19" uuid="71268ea0-e71f-423f-b38d-f7161092bd08"/>
+				<textElement verticalAlignment="Bottom">
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="455" y="0" width="100" height="19" uuid="438c9383-3354-45be-8036-83eb09a19005"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="221" y="0" width="71" height="19" forecolor="#999999" uuid="dffa73cc-c194-47d2-a78e-1983c852a0bd"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Pagina]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="392" y="0" width="63" height="19" forecolor="#999999" uuid="dfeb9614-c64e-4cf8-84d6-bd7d427acef0"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Cantidad]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
