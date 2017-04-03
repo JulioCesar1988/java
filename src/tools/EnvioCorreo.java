@@ -116,7 +116,7 @@ public class EnvioCorreo
             
             // Guardamos en carpeta de salida
             Store store = session.getStore("imap");
-            store.connect("smtp.millerbi.net", "sistemaproto@millerbi.net", "xxxxxxxxxxx");
+            store.connect("smtp.millerbi.net", "xxxxxxxxx@millerbi.net", "xxxxxxxxxxx");
             Folder folder = store.getFolder("INBOX.Sent");
             folder.open(Folder.READ_WRITE);  
             message.setFlag(Flag.SEEN, true);  
