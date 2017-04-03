@@ -39,12 +39,12 @@ public class EnvioCorreo
     		ArrayList<String> listaDeCorreos = ec.getCorreosXAccionNivel(nivel);
     		listaDeCorreos.size();
     		System.out.println(listaDeCorreos.get(0));
-            // Propiedades de la conexi髇
+            // Propiedades de la conexi贸n
             Properties props = new Properties();
             props.setProperty("mail.smtp.host", "smtp.millerbi.net");
             props.setProperty("mail.smtp.starttls.enable", "true");
             props.setProperty("mail.smtp.port", "587");
-            props.setProperty("mail.smtp.user", "sistemaproto@millerbi.net");
+            props.setProperty("mail.smtp.user", "xxxxo@millerbi.net");
             props.setProperty("mail.smtp.auth", "true");
 
             // Preparamos la sesion
@@ -53,7 +53,7 @@ public class EnvioCorreo
             // Construimos el mensaje
             
             MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress("sistemaproto@millerbi.net")); // Quien envia el msj .
+            message.setFrom(new InternetAddress("xxxxxxx@millerbi.net")); // Quien envia el msj .
             
             int sizeTo=listaDeCorreos.size();
             InternetAddress[] addressTo = new InternetAddress[sizeTo];
@@ -64,13 +64,13 @@ public class EnvioCorreo
             message.setRecipients(
                 Message.RecipientType.TO,    
                 /*new InternetAddress("marceloburriel@gmail.com")*/addressTo);  // Quienes lo reciben. 
-            message.setSubject("Actualizaci髇");
+            message.setSubject("Actualizaci贸n");
             System.out.println(nivel);
             switch(nivel){
             case "aprobar paquete ctrl prod":
             	BodyPart texto = new MimeBodyPart();
             	MimeMultipart multiParte = new MimeMultipart();
-            	String html="Se ha producido una actualizaci髇 en el sistema.<br>" + "Tiene una nueva orden de producci髇 para <b>aprobar</b> en obra n鷐ero <b>"+numObra+"</b>, paquete n鷐ero <b>"+numPaq+"</b>.";
+            	String html="Se ha producido una actualizaci贸n en el sistema.<br>" + "Tiene una nueva orden de producci贸n para <b>aprobar</b> en obra n煤mero <b>"+numObra+"</b>, paquete n煤mero <b>"+numPaq+"</b>.";
                 texto.setContent(html, "text/html");
                 if (adj!="") {
 					
@@ -88,35 +88,35 @@ public class EnvioCorreo
                 message.setContent(multiParte);
                 break;
             case "aprobar paquete ing":message.setText(
-            		"Se ha producido una actualizaci髇 en el sistema.<br>" + "Tiene una nueva orden de producci髇 para <b>aprobar</b> en obra n鷐ero <b>"+numObra+"</b>, paquete n鷐ero <b>"+numPaq+"</b>.",
+            		"Se ha producido una actualizaci贸n en el sistema.<br>" + "Tiene una nueva orden de producci贸n para <b>aprobar</b> en obra n煤mero <b>"+numObra+"</b>, paquete n煤mero <b>"+numPaq+"</b>.",
             		"ISO-8859-1",
             		"html");
             		break;
             case "definir tareas":message.setText(
-            		"Se ha producido una actualizaci髇 en el sistema.<br>" + "Tiene una nueva orden de producci髇 para <b>definir tareas</b> en obra n鷐ero <b>"+numObra+"</b>, paquete n鷐ero <b>"+numPaq+"</b>.",
+            		"Se ha producido una actualizaci贸n en el sistema.<br>" + "Tiene una nueva orden de producci贸n para <b>definir tareas</b> en obra n煤mero <b>"+numObra+"</b>, paquete n煤mero <b>"+numPaq+"</b>.",
             		"ISO-8859-1",
             		"html");
             		break;
             
             case "obra nueva":message.setText(
-            		"Se ha producido una actualizaci髇 en el sistema.<br>" + "Se ha creado la obra <b>"+obra.getNumero()+" - "+obra.getNombre()+"</b>.",
+            		"Se ha producido una actualizaci贸n en el sistema.<br>" + "Se ha creado la obra <b>"+obra.getNumero()+" - "+obra.getNombre()+"</b>.",
             		"ISO-8859-1",
             		"html");
         			break;
             case "obra modificada":message.setText(
-            		"Se ha producido una actualizaci髇 en el sistema.<br>" + "Se ha modificado la obra <b>"+obra.getNumero()+" - "+obra.getNombre()+"</b>.",
+            		"Se ha producido una actualizaci贸n en el sistema.<br>" + "Se ha modificado la obra <b>"+obra.getNumero()+" - "+obra.getNombre()+"</b>.",
             		"ISO-8859-1",
             		"html");
         			break;
             }
             // Lo enviamos.
             Transport t = session.getTransport("smtp");
-            t.connect("sistemaproto@millerbi.net", "sistemaproto2013");
+            t.connect("sistemaproto@millerbi.net", "xxxxxxxxx");
             t.sendMessage(message, message.getAllRecipients());
             
             // Guardamos en carpeta de salida
             Store store = session.getStore("imap");
-            store.connect("smtp.millerbi.net", "sistemaproto@millerbi.net", "sistemaproto2013");
+            store.connect("smtp.millerbi.net", "sistemaproto@millerbi.net", "xxxxxxxxxxx");
             Folder folder = store.getFolder("INBOX.Sent");
             folder.open(Folder.READ_WRITE);  
             message.setFlag(Flag.SEEN, true);  
