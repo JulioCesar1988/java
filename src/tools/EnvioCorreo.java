@@ -41,7 +41,7 @@ public class EnvioCorreo
     		System.out.println(listaDeCorreos.get(0));
             // Propiedades de la conexión
             Properties props = new Properties();
-            props.setProperty("mail.smtp.host", "smtp.millerbi.net");
+            props.setProperty("mail.smtp.host", "xxxxxxx.xxxxxxxxxx.net");
             props.setProperty("mail.smtp.starttls.enable", "true");
             props.setProperty("mail.smtp.port", "587");
             props.setProperty("mail.smtp.user", "xxxxo@millerbi.net");
@@ -116,7 +116,7 @@ public class EnvioCorreo
             
             // Guardamos en carpeta de salida
             Store store = session.getStore("imap");
-            store.connect("smtp.millerbi.net", "xxxxxxxxx@millerbi.net", "xxxxxxxxxxx");
+            store.connect("smtp.millerbi.net", "xxxxxxxxx@xxxxxxxxxxxxx.net", "xxxxxxxxxxx");
             Folder folder = store.getFolder("INBOX.Sent");
             folder.open(Folder.READ_WRITE);  
             message.setFlag(Flag.SEEN, true);  

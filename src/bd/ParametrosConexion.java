@@ -51,18 +51,18 @@ public class ParametrosConexion {
 	}
 	public static ParametrosConexion getParametros(){
 		ParametrosConexion retorno = new ParametrosConexion();
-		retorno.setBdName("millerdb");
-		retorno.setPort("1433");
+		retorno.setBdName("xxxxxxxxxxxxxxxxx");
+		retorno.setPort("xxxx");
 		
-		/** Server Producción: SERVERPROTO **/
-		retorno.setHost("159.96.45.180");
-		retorno.setUser("admin");
-		retorno.setPass("ggam2013");
+		/** Server ProducciÃ³n: SERVERPROTO **/
+		retorno.setHost("xxxxxxxx);
+		retorno.setUser("xxxxxxxxxx");
+		retorno.setPass("xxxxxxxxx");
 		
-		/** Server Producción: WIN-9B65SB60LJ0 **/
-		//retorno.setHost("159.96.45.192");
-		//retorno.setUser("desarrollador");
-		//retorno.setPass("dd");
+		/** Server ProducciÃ³n: WIN-9B65SB60LJ0 **/
+		//retorno.setHost("xxxxxxxx");
+		//retorno.setUser("dxxxxxxxxx");
+		//retorno.setPass("xxxxxxxxxx");
 		
 		return retorno;
 	}
