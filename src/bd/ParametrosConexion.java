@@ -1,5 +1,7 @@
 package bd;
 
+import bd.ParametrosConexion;
+
 public class ParametrosConexion {
 
 	String host;
@@ -50,19 +52,20 @@ public class ParametrosConexion {
 		this.driverString = driverString;
 	}
 	public static ParametrosConexion getParametros(){
+		
 		ParametrosConexion retorno = new ParametrosConexion();
-		retorno.setBdName("xxxxxxxxxxxxxxxxx");
-		retorno.setPort("xxxx");
+		retorno.setBdName("millerdb");
+		retorno.setPort("1433");
 		
-		/** Server ProducciÃ³n: SERVERPROTO **/
-		retorno.setHost("xxxxxxxx);
-		retorno.setUser("xxxxxxxxxx");
-		retorno.setPass("xxxxxxxxx");
+		/** Server Producción: SERVERPROTO **/
+		retorno.setHost("159.96.45.180");
+		retorno.setUser("admin");
+		retorno.setPass("ggam2013");
 		
-		/** Server ProducciÃ³n: WIN-9B65SB60LJ0 **/
-		//retorno.setHost("xxxxxxxx");
-		//retorno.setUser("dxxxxxxxxx");
-		//retorno.setPass("xxxxxxxxxx");
+		/** Server Producción: WIN-9B65SB60LJ0 **/
+		//retorno.setHost("159.96.45.96");
+		//retorno.setUser("desarrollador");
+		//retorno.setPass("dd");
 		
 		return retorno;
 	}

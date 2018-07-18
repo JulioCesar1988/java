@@ -17,7 +17,7 @@ import bd.Conector;
 import bd.ParametrosConexion;
 import controllers.ReporteController;
 import tools.EtiquetasDatasurce;
-import views.Loading;
+
 import session.Session;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporter;
