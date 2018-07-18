@@ -3,11 +3,17 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/GRAFICOS"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/GRAFICO"/>
 	<classpathentry kind="lib" path="LIBS/groovy-all-2.0.1.jar"/>
 	<classpathentry kind="lib" path="LIBS/jcalendar-1.4.jar"/>
 	<classpathentry kind="lib" path="LIBS/sqljdbc4.jar"/>
 	<classpathentry kind="lib" path="LIBS/swingx-all-1.6.4.jar"/>
 	<classpathentry kind="lib" path="LIBS/tools.jar"/>
+	<classpathentry kind="lib" path="C:/Users/jcontreras/eclipse-workspace/java/LIBS/groovy-all-2.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/jcontreras/eclipse-workspace/java/LIBS/jcalendar-1.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/jcontreras/eclipse-workspace/java/LIBS/sqljdbc4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/jcontreras/eclipse-workspace/java/LIBS/swingx-all-1.6.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/jcontreras/eclipse-workspace/java/LIBS/tools.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JAVAMAIL"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JASPER"/>
 	<classpathentry kind="lib" path="/LeerExcelDesdeJava/JarsExcel/dom4j-1.6.jar"/>

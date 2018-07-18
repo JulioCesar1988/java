@@ -93,10 +93,7 @@ public class Coordinacion extends JInternalFrame {
 		btnObrasYPaquetes.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// Generacion de paquetes
-			    
-			
-				
-				
+			  
 				
 				if (comboBoxObra.getSelectedItem()!=null) {
 					
