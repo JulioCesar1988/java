@@ -56,7 +56,7 @@ public class PantallaPrincipal extends JFrame {
 	public PantallaPrincipal() {
 		setBackground(Color.DARK_GRAY);
 		setIconImage(Toolkit.getDefaultToolkit().getImage("Reportes\\logoHeader.png"));
-		setTitle("Reportes2018");
+		setTitle("reportes");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1845, 818);
 
