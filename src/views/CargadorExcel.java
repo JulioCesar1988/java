@@ -86,7 +86,7 @@ public class CargadorExcel extends JInternalFrame {
 	JDateChooser dateChooserDespacho;
 	public ArrayList<PiezaBean> piezas = new ArrayList<PiezaBean>();
 	
-	
+
 	
  	/**
 	 * Launch the application.
@@ -102,12 +102,19 @@ public class CargadorExcel extends JInternalFrame {
 					e.printStackTrace();
 				}
 			}
-		});
-	}
+			 });
+		
+	}	
+	
+	
+
+		
+	
 
 	/**
 	 * Create the frame.
 	 */
+	
 	@SuppressWarnings("unchecked")
 	public CargadorExcel() {
 		setBackground(Color.DARK_GRAY);
@@ -232,13 +239,13 @@ public class CargadorExcel extends JInternalFrame {
 		btnSeleccionarExcel.setBackground(Color.WHITE);
 		btnSeleccionarExcel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-			// Áca vamos a seleccionar el archivo excel.	
+			// Ã�ca vamos a seleccionar el archivo excel.	
 				
 				JFileChooser fileChooser = new JFileChooser();
 			      int returnValue = fileChooser.showOpenDialog(null);
 			      if (returnValue == JFileChooser.APPROVE_OPTION) {
 			        selectedFile = fileChooser.getSelectedFile();
-			           // Acá ya tengo el path del archivo 
+			           // AcÃ¡ ya tengo el path del archivo 
 			           textFieldPath.setText(selectedFile.getPath()  ); 
 			        
 				          
@@ -535,7 +542,7 @@ public class CargadorExcel extends JInternalFrame {
 						}
 						else{javax.swing.JOptionPane.showMessageDialog(null, "La fecha de despacho es obligatoria");}
 					}else{
-						javax.swing.JOptionPane.showMessageDialog(null, "La fecha de fabricación es obligatoria");
+						javax.swing.JOptionPane.showMessageDialog(null, "La fecha de fabricaciÃ³n es obligatoria");
 					}
 						
         
@@ -547,9 +554,14 @@ public class CargadorExcel extends JInternalFrame {
 		            
 		        }
 				
-			}		        
-				
+				}
+		
+	}	  
+		
+	
+	}    
+		
 			
   
 				  
-		});
+		
