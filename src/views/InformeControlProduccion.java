@@ -14,7 +14,10 @@ import javax.swing.JSeparator;
 
 import com.toedter.calendar.JDateChooser;
 
+import controllers.EdificioController;
 import controllers.ObrasController;
+import net.sf.jasperreports.engine.JRException;
+import reportes.ReporteGenerador;
 import tools.CargadorCombobox;
 
 import javax.swing.JButton;
@@ -165,24 +168,56 @@ public class InformeControlProduccion extends JInternalFrame {
 						// No seleciono edificio ó no aplico el filtro
 						if ((rdbtnNewRadioButton.isSelected())) {
 							System.out.println("paso 4");
-							
-
 								System.out.println("Filtrado de Edificio Aplicado");
-
 								if (comboBoxEdificio.getSelectedItem() != null) {
 									System.out.println("Obra -> " + comboBoxObra.getSelectedIndex());
-									System.out.println("Edificio -> " + comboBoxEdificio);
+									System.out.println("Edificio -> " + comboBoxEdificio.getSelectedIndex());
+									System.out.println("Edificio -> " + (String) comboBoxEdificio.getSelectedItem());
 									System.out.println("Proceso de generacion de informe -> ....");
 									// Generacion de Reporte con filtro de edificios .
 									String formato = dateChooser.getDateFormatString();
 									Date date = dateChooser.getDate();
 									SimpleDateFormat sdf = new SimpleDateFormat(formato);
 
-									System.out.println("Desde -> " + dateChooser.getDate().toString());
-									System.out.println("Hasta -> " + dateChooser_1.getDate().toString());
-
+									System.out.println("Desde -> " + String.valueOf(sdf.format(date)));
+									String desde = String.valueOf(sdf.format(date));
+									Date date1 = dateChooser_1.getDate();
+									System.out.println("Hasta -> " + String.valueOf(sdf.format(date1)));
+                                    String hasta = String.valueOf(sdf.format(date1));
 									System.out.println("Proceso de generacion de informe -> ....");
+									
+									String obra = (String) comboBoxObra.getSelectedItem();
+									StringTokenizer tk = new StringTokenizer(obra, " - ");
+									int num_obra = Integer.parseInt(tk.nextToken());
+									
+                                    ReporteGenerador rp = new ReporteGenerador();
+                            
+                                    
+									try {
 
+	                                    int id_obra = 0;
+								        // buscamos informacion del edifio para enviar al filtro 
+	                                    EdificioController  ed = new EdificioController();
+	                                    ObrasController ob = new ObrasController();
+										id_obra = ob.getIdObraPorId(num_obra);
+										int id_edificio = ed.getIdEdificioPorNombre((String) comboBoxEdificio.getSelectedItem(), id_obra);
+										try {
+											rp.generarReporteControlProduccion2018PDFConFiltro(desde,hasta,num_obra ,id_edificio);
+										} catch (JRException e1) {
+											// TODO Auto-generated catch block
+											e1.printStackTrace();
+										}
+										
+										
+									} catch (SQLException e2) {
+										// TODO Auto-generated catch block
+										e2.printStackTrace();
+									}
+                                   
+                                    
+                                 
+                                    
+									
 								} else {
 									System.out.println("No ingreso Edificio !!!");
 								}
@@ -191,19 +226,29 @@ public class InformeControlProduccion extends JInternalFrame {
 								System.out.println("Sin Aplicacion de Filtrado");
 								// Generacion de Reporte sin filtro de edificios .
 								System.out.println(" Obra - > " + comboBoxObra.getSelectedIndex());
+								String obra = (String) comboBoxObra.getSelectedItem();
+								StringTokenizer tk = new StringTokenizer(obra, " - ");
+								int num_obra = Integer.parseInt(tk.nextToken());
 								String formato = dateChooser.getDateFormatString();
 								Date date = dateChooser.getDate();
 								SimpleDateFormat sdf = new SimpleDateFormat(formato);
-								System.out.println("Desde -> " + dateChooser.getDate().toString());
-								System.out.println("Hasta -> " + dateChooser_1.getDate().toString());
+								System.out.println("Desde -> " + String.valueOf(sdf.format(date)));
+								String desde = String.valueOf(sdf.format(date));
+								Date date1 = dateChooser_1.getDate();
+								System.out.println("Hasta -> " + String.valueOf(sdf.format(date1)));
+                                String hasta = String.valueOf(sdf.format(date1));
 								System.out.println("Proceso de generacion de informe -> ....");
+								ReporteGenerador rp = new ReporteGenerador();
+                                           try {
+									 rp.generarReporteControlProduccion2018PDF(desde,hasta,num_obra);
+                                } catch (JRException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
 
 							}
 
-						
-
 					} else {
-						
 						
 						System.out.println("No selecciono Obra ");
 						

@@ -12,11 +12,20 @@
 	<parameter name="hasta" class="java.lang.String">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
+	<parameter name="id_edificio" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
 	<queryString>
-		<![CDATA[SELECT obras.numero as numero_obra , paquetes.numero as numero_paquete , Paquete_Empleado_aprobado_produccion.fecha,paquetes.descripcion,obras.nombre
+		<![CDATA[SELECT obras.numero as numero_obra ,
+       paquetes.numero as numero_paquete ,
+       Paquete_Empleado_aprobado_produccion.fecha,paquetes.descripcion,
+       obras.nombre ,
+       edificio.nombre as NombreEdificio
+
 FROM OBRAS INNER JOIN PAQUETES ON (OBRAS.ID_OBRA = PAQUETES.ID_OBRA)
            INNER JOIN Paquete_Empleado_aprobado_produccion ON (PAQUETES.ID_PAQUETE =Paquete_Empleado_aprobado_produccion.ID_PAQUETE )
-WHERE OBRAS.NUMERO = $P{num_obra} and  paquetes.id_paquete IN (select id_paquete
+           inner join  edificio on (  paquetes.id_edificio = edificio.id_edificio)
+WHERE OBRAS.NUMERO = $P{num_obra} and paquetes.id_edificio = $P{id_edificio} and  paquetes.id_paquete IN (select id_paquete
 						   from Paquete_Empleado_aprobado_produccion
 						   where (activado = 1) and fecha between $P{desde} and $P{hasta} )]]>
 	</queryString>
@@ -25,6 +34,7 @@ WHERE OBRAS.NUMERO = $P{num_obra} and  paquetes.id_paquete IN (select id_paquete
 	<field name="fecha" class="java.sql.Timestamp"/>
 	<field name="descripcion" class="java.lang.String"/>
 	<field name="nombre" class="java.lang.String"/>
+	<field name="NombreEdificio" class="java.lang.String"/>
 	<variable name="numero_paquete_1" class="java.lang.Integer" resetType="Column" calculation="Count">
 		<variableExpression><![CDATA[$F{numero_paquete}]]></variableExpression>
 	</variable>
@@ -34,7 +44,7 @@ WHERE OBRAS.NUMERO = $P{num_obra} and  paquetes.id_paquete IN (select id_paquete
 	<title>
 		<band height="79" splitType="Stretch">
 			<rectangle>
-				<reportElement x="0" y="0" width="802" height="79" uuid="8b34cf78-f31b-4d25-80f4-268b85d09646"/>
+				<reportElement x="43" y="0" width="759" height="78" uuid="8b34cf78-f31b-4d25-80f4-268b85d09646"/>
 			</rectangle>
 			<staticText>
 				<reportElement x="640" y="20" width="46" height="20" uuid="cbcb57eb-1004-4500-a776-51e9e3f4c231"/>
@@ -66,8 +76,8 @@ WHERE OBRAS.NUMERO = $P{num_obra} and  paquetes.id_paquete IN (select id_paquete
 				<text><![CDATA[Obras]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="233" y="2" width="96" height="18" uuid="f93cc2ca-e86f-4807-8778-aec11059bd0a"/>
-				<textElement textAlignment="Center" verticalAlignment="Bottom">
+				<reportElement x="233" y="2" width="302" height="18" uuid="f93cc2ca-e86f-4807-8778-aec11059bd0a"/>
+				<textElement verticalAlignment="Bottom">
 					<font isItalic="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{numero_obra}]]></textFieldExpression>
@@ -87,7 +97,7 @@ WHERE OBRAS.NUMERO = $P{num_obra} and  paquetes.id_paquete IN (select id_paquete
 				<text><![CDATA[Nombre]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="257" y="24" width="100" height="20" uuid="0d282ef5-1d8d-4bd1-84d7-935fd4e3c2c1"/>
+				<reportElement x="257" y="24" width="278" height="20" uuid="0d282ef5-1d8d-4bd1-84d7-935fd4e3c2c1"/>
 				<textElement verticalAlignment="Middle">
 					<font isItalic="true"/>
 				</textElement>
@@ -111,6 +121,18 @@ WHERE OBRAS.NUMERO = $P{num_obra} and  paquetes.id_paquete IN (select id_paquete
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Fecha Actual]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="257" y="44" width="278" height="20" uuid="9127fcfe-b6de-4515-b614-aa00eb0e637d"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{NombreEdificio}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="193" y="44" width="64" height="20" uuid="8a62e79d-e4e7-40c6-b6e4-999d93d20a2e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Edificio :]]></text>
 			</staticText>
 		</band>
 	</title>

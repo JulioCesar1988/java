@@ -160,52 +160,38 @@ public void generarReporteParteTareasVersionExcel(String desde, String hasta) th
 	}
 	
 	
-	// Reporte para irina y fernanda , control de produccion 
-	public void generarReporteControlProduccion2018PDF(String desde, String hasta , int num_obra , int num_edif) throws JRException {
-
+	// Reporte para Irina y Fernanda , control de produccion
+	public void generarReporteControlProduccion2018PDF(String desde , String hasta , int num_obra  ) throws JRException {
 		c = new Conector(ParametrosConexion.getParametros());
-		conexion = c.getConnection();	
-		
-		JFileChooser chooser = new JFileChooser();
-		chooser.setCurrentDirectory(new File("."));
-		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		chooser.showSaveDialog(null);
-		File selectedPfile2 = chooser.getSelectedFile();
-		if (selectedPfile2!=null) {
-			String path = selectedPfile2.getAbsolutePath();	
-			
-			Map<String, Object> parametros = new HashMap<String, Object>();
-			parametros.put("desde", desde);
-			parametros.put("hasta", hasta);
-			parametros.put("num_obra", num_obra);
-			parametros.put("num_edif", num_edif);
-			
-			
-           // falta agregar un filtro para no filtrar por edifio los paquetes 
-			JasperReport reporte = (JasperReport) JRLoader.loadObject("reporteControlProduccion2018.jasper");
-	        JasperPrint jasperPrint = JasperFillManager.fillReport(reporte, parametros, conexion);
-	
-	        JRExporter exporter = new JRPdfExporter();
-	         
-	        exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-	        exporter.setParameter(JRExporterParameter.OUTPUT_FILE, new java.io.File(path+".pdf"));
-	        exporter.exportReport();
-	        
-	        
-		}		
+		conexion = c.getConnection();
+		Map<String, Object> parametros = new HashMap<String, Object>();
+		parametros.put("desde", desde);
+		parametros.put("hasta", hasta);
+		parametros.put("num_obra", num_obra);
+		JasperReport reporte = JasperCompileManager.compileReport("Reportes/reporteControlProduccion2018.jrxml");
+		JasperPrint jasperPrint = JasperFillManager.fillReport(reporte, parametros, conexion);
+		JasperViewer repvis = new JasperViewer(jasperPrint, false);
+		repvis.setTitle("muestra del reporte");
+		repvis.show();
 	}
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	// Reporte para Irina y Fernanda , control de produccion
+	public void generarReporteControlProduccion2018PDFConFiltro(String desde , String hasta , int num_obra ,int id_edificio ) throws JRException {
+		c = new Conector(ParametrosConexion.getParametros());
+		conexion = c.getConnection();
+		Map<String, Object> parametros = new HashMap<String, Object>();
+		parametros.put("desde", desde);
+		parametros.put("hasta", hasta);
+		parametros.put("num_obra", num_obra);
+		parametros.put("id_edificio", id_edificio);
+		
+		JasperReport reporte = JasperCompileManager.compileReport("Reportes/reporteControlProduccion2018ConFiltro.jrxml");
+		JasperPrint jasperPrint = JasperFillManager.fillReport(reporte, parametros, conexion);
+		JasperViewer repvis = new JasperViewer(jasperPrint, false);
+		repvis.setTitle("muestra del reporte");
+		repvis.show();
+	}
 	
 	
 	
