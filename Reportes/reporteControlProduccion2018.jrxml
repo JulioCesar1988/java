@@ -13,12 +13,15 @@
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
 	<queryString>
-		<![CDATA[SELECT obras.numero as numero_obra , paquetes.numero as numero_paquete , Paquete_Empleado_aprobado_produccion.fecha,paquetes.descripcion,obras.nombre
-FROM OBRAS INNER JOIN PAQUETES ON (OBRAS.ID_OBRA = PAQUETES.ID_OBRA)
+		<![CDATA[SELECT obras.numero as numero_obra ,
+       paquetes.numero as numero_paquete ,
+       Paquete_Empleado_aprobado_produccion.fecha,
+       paquetes.descripcion,obras.nombre
+FROM (select * from obras where activado = 1 and numero = $P{num_obra} ) AS OBRAS INNER JOIN (select * from paquetes where activado = 1) AS PAQUETES ON (OBRAS.ID_OBRA = PAQUETES.ID_OBRA)
            INNER JOIN Paquete_Empleado_aprobado_produccion ON (PAQUETES.ID_PAQUETE =Paquete_Empleado_aprobado_produccion.ID_PAQUETE )
 WHERE OBRAS.NUMERO = $P{num_obra} and  paquetes.id_paquete IN (select id_paquete
 						   from Paquete_Empleado_aprobado_produccion
-						   where (activado = 1) and fecha between $P{desde} and $P{hasta} )]]>
+						   where (activado = 1) and  fecha between $P{desde} and $P{hasta} )]]>
 	</queryString>
 	<field name="numero_obra" class="java.lang.Integer"/>
 	<field name="numero_paquete" class="java.lang.Integer"/>
@@ -124,7 +127,7 @@ WHERE OBRAS.NUMERO = $P{num_obra} and  paquetes.id_paquete IN (select id_paquete
 				<textElement textAlignment="Center">
 					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[Num Paq]]></text>
+				<text><![CDATA[Numero]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="424" y="1" width="100" height="19" uuid="3c15b486-28e8-45b2-92aa-302497d1e820"/>
